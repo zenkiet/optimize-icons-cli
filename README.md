@@ -1,8 +1,29 @@
 # optimize-icons-cli
 
-[![npm version](https://img.shields.io/npm/v/optimize-icons-cli.svg)](https://www.npmjs.com/package/optimize-icons-cli)
-[![npm downloads](https://img.shields.io/npm/dm/optimize-icons-cli.svg)](https://www.npmjs.com/package/optimize-icons-cli)
-[![License](https://img.shields.io/npm/l/optimize-icons-cli.svg)](https://github.com/yourusername/optimize-icons-cli/blob/main/LICENSE)
+<p align="center">
+  <img src="assets/logo.png" alt="Optimize Icons CLI" width="300" height="300"/>
+</p>
+
+<h1 align="center">optimize-icons-cli</h1>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/optimize-icons-cli">
+    <img src="https://img.shields.io/npm/v/optimize-icons-cli.svg" alt="npm version" />
+  </a>
+  <a href="https://www.npmjs.com/package/optimize-icons-cli">
+    <img src="https://img.shields.io/npm/dm/optimize-icons-cli.svg" alt="npm downloads" />
+  </a>
+  <a href="https://github.com/yourusername/optimize-icons-cli/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/optimize-icons-cli.svg" alt="license" />
+  </a>
+  <a href="https://github.com/yourusername/optimize-icons-cli/stargazers">
+    <img src="https://img.shields.io/github/stars/yourusername/optimize-icons-cli" alt="stars" />
+  </a>
+</p>
+
+<p align="center">
+  A powerful CLI tool for optimizing icons in your web projects with focus on performance and simplicity.
+</p>
 
 A command-line tool for optimizing icons in your web projects. This tool helps reduce icon file sizes and improve loading performance.
 
@@ -54,17 +75,18 @@ optimize-icons
 ```
 
 The tool will prompt you for:
+
 - Output path (default: dist/browser)
 - Verbose mode (yes/no)
 
 ### Options
 
-| Option | Alias | Description |
-|--------|-------|-------------|
-| `--output-path` | `-o` | Specify the output directory for optimized icons |
-| `--verbose` | `-v` | Enable verbose output |
-| `--version` | - | Show version number |
-| `--help` | - | Show help |
+| Option          | Alias | Description                                      |
+| --------------- | ----- | ------------------------------------------------ |
+| `--output-path` | `-o`  | Specify the output directory for optimized icons |
+| `--verbose`     | `-v`  | Enable verbose output                            |
+| `--version`     | -     | Show version number                              |
+| `--help`        | -     | Show help                                        |
 
 ## Programmatic Usage
 
@@ -83,7 +105,15 @@ The tool accepts the following configuration options:
 
 ```typescript
 interface OptimizeIconsOptions {
-  outputPath: string;  // Path where optimized icons will be saved
-  verbose: boolean;    // Enable detailed logging
+  outputPath: string; // Path where optimized icons will be saved
+  verbose: boolean; // Enable detailed logging
 }
 ```
+
+## 💫 Deployment
+
+Add additional notes about how to deploy this on a live system.
+
+---
+
+<p align="center">Made with ❤️ by <a href="https://github.com/zenkiet">Kiet Le</a></p>
