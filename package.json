@@ -1,6 +1,6 @@
 {
   "name": "optimize-icons-cli",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "CLI tool for optimizing icons",
   "main": "dist/cli.js",
   "types": "dist/types/index.d.ts",
@@ -24,8 +24,11 @@
   "author": "Kiet Le",
   "license": "MIT",
   "dependencies": {
+    "colorette": "^2.0.20",
+    "commander": "^12.1.0",
     "glob": "^11.0.0",
     "inquirer": "^12.1.0",
+    "ora": "^5.4.1",
     "prettier": "^3.3.3",
     "yargs": "^17.7.2"
   },
