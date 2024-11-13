@@ -1,0 +1,86 @@
+name: Build, Publish and Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for changelog generation
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Check version changes
+        id: check_version
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          LATEST_VERSION=${LATEST_TAG#v}
+          echo "Current version: $CURRENT_VERSION"
+          echo "Latest tagged version: $LATEST_VERSION"
+          if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+            echo "NEW_VERSION_EXISTS=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "NEW_VERSION_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Changelog
+        if: steps.check_version.outputs.NEW_VERSION_EXISTS == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          echo "## What's Changed" > changelog.md
+          echo "" >> changelog.md
+          git log $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD --pretty=format:"* %s (%h)" >> changelog.md
+
+      - name: Publish to npm
+        if: steps.check_version.outputs.NEW_VERSION_EXISTS == 'true' && github.ref == 'refs/heads/main'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Git Tag and Release
+        if: steps.check_version.outputs.NEW_VERSION_EXISTS == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          VERSION=${{ steps.check_version.outputs.VERSION }}
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create GitHub Release
+        if: steps.check_version.outputs.NEW_VERSION_EXISTS == 'true' && github.ref == 'refs/heads/main'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.check_version.outputs.VERSION }}
+          release_name: Release v${{ steps.check_version.outputs.VERSION }}
+          body_path: ./changelog.md
+          draft: false
+          prerelease: false
