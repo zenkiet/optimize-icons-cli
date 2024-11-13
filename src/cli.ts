@@ -1,9 +1,12 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import IconOptimizer from './core/icon-optimize';
-import inquirer  from 'inquirer';
+import inquirer from 'inquirer';
 
 
+/**
+ * Prompt the user for input if no CLI arguments are provided
+*/
 async function promptUserInput() {
     const defaultOutputPath = 'dist/browser';
 
@@ -42,7 +45,6 @@ async function main() {
         .help()
         .argv;
 
-    // Nếu không có arguments từ CLI, hỏi người dùng
     const config = cliArgs.outputPath || cliArgs.verbose
         ? cliArgs
         : await promptUserInput();
