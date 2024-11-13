@@ -1,12 +1,15 @@
-name: Publish Package
+name: Build Project
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -25,10 +28,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
+      - name: Run build
         run: npm run build
-
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

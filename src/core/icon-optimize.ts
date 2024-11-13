@@ -1,13 +1,9 @@
-import { promises as fs } from "fs";
-import { glob } from "glob";
-import * as path from "path";
-import { Logger } from "../utils/logger";
-import { svgFormatter } from "../utils/formatter";
-import {
-  OptimizeIconsOptions,
-  OptimizationStats,
-  ProcessSvgResult,
-} from "./types";
+import { promises as fs } from 'fs';
+import { glob } from 'glob';
+import * as path from 'path';
+import { svgFormatter } from '../utils/formatter';
+import { Logger } from '../utils/logger';
+import { OptimizationStats, OptimizeIconsOptions, ProcessSvgResult } from './types';
 
 export class IconOptimizer {
   private usedIcons = new Set<string>();
@@ -27,12 +23,12 @@ export class IconOptimizer {
    */
   async optimize(): Promise<void> {
     try {
-      this.logger.startSpinner("Starting optimization...");
+      this.logger.startSpinner('Starting optimization...');
 
       await this.findUsedIcons();
       await this.processIconFiles();
 
-      this.logger.stopSpinner(true, "Optimization completed");
+      this.logger.stopSpinner(true, 'Optimization completed');
 
       this.logger.printSummary(this.stats);
     } catch (error) {
@@ -47,11 +43,11 @@ export class IconOptimizer {
     const files = await glob(`${this.options.outputPath}/**/*.{js,html}`);
 
     for (const file of files) {
-      const content = await fs.readFile(file, "utf8");
+      const content = await fs.readFile(file, 'utf8');
       const iconMatches = content.match(/[a-zA-Z_]+:[a-zA-Z0-9_-]+/g) || [];
 
       iconMatches.forEach((match) => {
-        const [, iconId] = match.split(":");
+        const [, iconId] = match.split(':');
         if (iconId) this.usedIcons.add(iconId);
       });
     }
@@ -74,20 +70,14 @@ export class IconOptimizer {
    * Optimize individual SVG file
    */
   private async optimizeSvgFile(filePath: string): Promise<void> {
-    const content = await fs.readFile(filePath, "utf8");
+    const content = await fs.readFile(filePath, 'utf8');
     const fileName = path.basename(filePath);
 
     this.logger.log(`Processing ${fileName}...`);
 
-    const { optimizedContent, removedCount, totalCount } =
-      await this.processSvgContent(content);
+    const { optimizedContent, removedCount, totalCount } = await this.processSvgContent(content);
 
-    this.updateStats(
-      content.length,
-      optimizedContent.length,
-      totalCount,
-      removedCount
-    );
+    this.updateStats(content.length, optimizedContent.length, totalCount, removedCount);
     await fs.writeFile(filePath, optimizedContent);
   }
 
@@ -100,7 +90,7 @@ export class IconOptimizer {
     let totalCount = 0;
     let removedCount = 0;
 
-    const svgStart = content.match(/<svg[^>]*>/)?.[0] || "";
+    const svgStart = content.match(/<svg[^>]*>/)?.[0] || '';
     const icons: string[] = [];
 
     while ((match = iconRegex.exec(content)) !== null) {
@@ -124,18 +114,15 @@ export class IconOptimizer {
   /**
    * Build optimized SVG content
    */
-  private async buildOptimizedContent(
-    svgStart: string,
-    icons: string[]
-  ): Promise<string> {
+  private async buildOptimizedContent(svgStart: string, icons: string[]): Promise<string> {
     const content = [
-      "<!-- @formatter:off -->",
+      '<!-- @formatter:off -->',
       svgStart,
-      "  <defs>",
-      icons.join("\n"),
-      "  </defs>",
-      "</svg>",
-    ].join("\n");
+      '  <defs>',
+      icons.join('\n'),
+      '  </defs>',
+      '</svg>',
+    ].join('\n');
 
     return await svgFormatter.formatContent(content);
   }
@@ -161,9 +148,9 @@ export class IconOptimizer {
     if (error instanceof URIError) {
       this.logger.error(error.message);
     } else if (error instanceof Error) {
-      this.logger.error("Build failed:", error);
+      this.logger.error('Build failed:', error);
     } else {
-      this.logger.error("An unknown error occurred during build");
+      this.logger.error('An unknown error occurred during build');
     }
     process.exit(1);
   }

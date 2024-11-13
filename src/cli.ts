@@ -1,10 +1,8 @@
-import { hideBin } from "yargs/helpers";
-import { blue, red } from "colorette";
-import { OptimizeIconsOptions } from "./core/types";
-import yargs from "yargs";
-import inquirer from "inquirer";
-import IconOptimizer from "./core/icon-optimize";
-import { Command } from "commander";
+import { blue, red } from 'colorette';
+import { Command } from 'commander';
+import inquirer from 'inquirer';
+import IconOptimizer from './core/icon-optimize';
+import { OptimizeIconsOptions } from './core/types';
 
 type PackageJson = Readonly<{
   version: string;
@@ -18,7 +16,7 @@ class CLI {
   private readonly packageJson: PackageJson;
 
   private constructor() {
-    this.packageJson = require("../package.json");
+    this.packageJson = require('../package.json');
     this.program = new Command();
     this.setupProgram();
   }
@@ -35,49 +33,46 @@ class CLI {
       blue(`
 ╭───────────────────────────────────────╮
 │  ${this.packageJson.name} v${this.packageJson.version}
-│  ${this.packageJson.description || ""}
+│  ${this.packageJson.description || ''}
 ╰───────────────────────────────────────╯
-        `),
+        `)
     );
   }
 
   private setupProgram(): void {
     this.program
-      .name(this.packageJson.name || "optimize-icons")
-      .description(this.packageJson.description || "Icon optimization tool")
+      .name(this.packageJson.name || 'optimize-icons')
+      .description(this.packageJson.description || 'Icon optimization tool')
       .version(this.packageJson.version)
-      .option(
-        "-o, --output-path <path>",
-        "Output path containing the built files",
-      )
-      .option("-v, --verbose", "Show verbose output")
+      .option('-o, --output-path <path>', 'Output path containing the built files')
+      .option('-v, --verbose', 'Show verbose output')
       .addHelpText(
-        "after",
+        'after',
         `
 Examples:
   $ optimize-icons -o dist/browser
-  $ optimize-icons -o dist/browser -v`,
+  $ optimize-icons -o dist/browser -v`
       );
   }
 
   private async promptUserInput(): Promise<OptimizeIconsOptions> {
     const answers = await inquirer.prompt<OptimizeIconsOptions>([
       {
-        type: "input",
-        name: "outputPath",
-        message: "Enter output path:",
-        default: "dist/browser",
+        type: 'input',
+        name: 'outputPath',
+        message: 'Enter output path:',
+        default: 'dist/browser',
         validate: (input) => {
           if (input.trim().length === 0) {
-            return "Output path is required";
+            return 'Output path is required';
           }
           return true;
         },
       },
       {
-        type: "confirm",
-        name: "verbose",
-        message: "Enable verbose output?",
+        type: 'confirm',
+        name: 'verbose',
+        message: 'Enable verbose output?',
         default: false,
       },
     ]);
@@ -85,13 +80,11 @@ Examples:
     return answers;
   }
 
-  private async handleCommand(
-    options: Partial<OptimizeIconsOptions>,
-  ): Promise<void> {
+  private async handleCommand(options: Partial<OptimizeIconsOptions>): Promise<void> {
     const config: OptimizeIconsOptions =
       options.outputPath || options.verbose
         ? {
-            outputPath: options.outputPath || "dist/browser",
+            outputPath: options.outputPath || 'dist/browser',
             verbose: options.verbose || false,
           }
         : await this.promptUserInput();
@@ -109,7 +102,7 @@ Examples:
       const config: OptimizeIconsOptions =
         options.outputPath || options.verbose
           ? {
-              outputPath: options.outputPath || "dist/browser",
+              outputPath: options.outputPath || 'dist/browser',
               verbose: options.verbose || false,
             }
           : await this.promptUserInput();
@@ -117,9 +110,8 @@ Examples:
       const optimizer = new IconOptimizer(config);
       await optimizer.optimize();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error(red("Fatal error:"), errorMessage);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(red('Fatal error:'), errorMessage);
       process.exit(1);
     }
   }
@@ -131,9 +123,8 @@ if (require.main === module) {
     try {
       await CLI.getInstance().run();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error(red("Fatal error:"), errorMessage);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(red('Fatal error:'), errorMessage);
       process.exit(1);
     }
   })();

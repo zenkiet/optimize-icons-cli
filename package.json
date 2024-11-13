@@ -9,7 +9,10 @@
   },
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/cli.js"
+    "start": "node dist/cli.js",
+    "format": "prettier --write './**/*.{ts,js,json}'",
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
   },
   "files": [
     "dist",
@@ -33,13 +36,24 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
     "@types/glob": "^8.1.0",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.9.0",
     "@types/yargs": "^17.0.33",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier-plugin-organize-imports": "^4.1.0",
     "typescript": "~5.4.0"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=22"
+  },
+  "volta": {
+    "node": "22.11.0"
+  },
+  "lint-staged": {
+    "*.{ts,json}": "prettier --cache --write"
   }
 }
