@@ -52,9 +52,7 @@ export class IconOptimizer {
       });
     }
 
-    console.log(this.usedIcons);
-
-    this.logger.log(`\nFound ${this.usedIcons.size} used icons`);
+    this.logger.log(`Found ${this.usedIcons.size} used icons`);
   }
 
   /**
