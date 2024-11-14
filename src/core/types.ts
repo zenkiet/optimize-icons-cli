@@ -1,5 +1,6 @@
 export interface OptimizeIconsOptions {
   outputPath: string;
+  iconsPath?: string;
   verbose?: boolean;
 }
 

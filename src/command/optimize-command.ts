@@ -1,5 +1,5 @@
 import inquirer from 'inquirer';
-import { OUTPUT_DIR, VERBOSE_DEFAULT } from '../constants';
+import { ICONS_DIR, OUTPUT_DIR, VERBOSE_DEFAULT } from '../constants';
 import IconOptimizer from '../core/icon-optimize';
 import { OptimizeIconsOptions } from '../core/types';
 import { BaseCommand } from './base-command';
@@ -13,7 +13,19 @@ export class OptimizeCommand implements BaseCommand {
         type: 'input',
         name: 'outputPath',
         message: 'Enter output path:',
-        default: 'dist/browser',
+        default: OUTPUT_DIR,
+        validate: (input) => {
+          if (input.trim().length === 0) {
+            return 'Output path is required';
+          }
+          return true;
+        },
+      },
+      {
+        type: 'input',
+        name: 'iconsPath',
+        message: 'Enter icons directory path:',
+        default: ICONS_DIR,
         validate: (input) => {
           if (input.trim().length === 0) {
             return 'Output path is required';
@@ -37,6 +49,7 @@ export class OptimizeCommand implements BaseCommand {
       this.options.outputPath || this.options.verbose
         ? {
             outputPath: this.options.outputPath || OUTPUT_DIR,
+            iconsPath: this.options.iconsPath || ICONS_DIR,
             verbose: this.options.verbose || VERBOSE_DEFAULT,
           }
         : await this.promptUserInput();

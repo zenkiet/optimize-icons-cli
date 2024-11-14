@@ -61,7 +61,13 @@ export class IconOptimizer {
    * Process all SVG icon files
    */
   private async processIconFiles(): Promise<void> {
-    const svgFiles = await glob(`${this.options.outputPath}/icons/*.svg`);
+    const iconPath = this.options.iconsPath || path.join(this.options.outputPath, 'icons');
+    const svgFiles = await glob(`${iconPath}/*.svg`);
+
+    if (svgFiles.length === 0) {
+      this.logger.warning(`No SVG files found in ${iconPath}`);
+      return;
+    }
 
     for (const file of svgFiles) {
       await this.optimizeSvgFile(file);
@@ -75,7 +81,7 @@ export class IconOptimizer {
     const content = await fs.readFile(filePath, 'utf8');
     const fileName = path.basename(filePath);
 
-    this.logger.log(`Processing ${fileName}...`);
+    this.logger.log(`\nProcessing ${fileName}...`);
 
     const { optimizedContent, removedCount, totalCount } = await this.processSvgContent(content);
 

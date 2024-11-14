@@ -77,16 +77,18 @@ optimize-icons
 The tool will prompt you for:
 
 - Output path (default: dist/browser)
+- Icons path (default: dist/browser/icons)
 - Verbose mode (yes/no)
 
 ### Options
 
-| Option          | Alias | Description                                      |
-| --------------- | ----- | ------------------------------------------------ |
-| `--output-path` | `-o`  | Specify the output directory for optimized icons |
-| `--verbose`     | `-v`  | Enable verbose output                            |
-| `--version`     | -     | Show version number                              |
-| `--help`        | -     | Show help                                        |
+| Option          | Alias | Description                                           |
+| --------------- | ----- | ----------------------------------------------------- |
+| `--output-path` | `-o`  | Specify the output dist directory for optimized icons |
+| `--icons-path`  | `-i`  | Specify the icons directory for optimized icons       |
+| `--verbose`     | `-v`  | Enable verbose output                                 |
+| `--version`     | -     | Show version number                                   |
+| `--help`        | -     | Show help                                             |
 
 ## Programmatic Usage
 
