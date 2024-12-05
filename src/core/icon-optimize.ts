@@ -60,14 +60,19 @@ export class IconOptimizer {
    */
   private async processIconFiles(): Promise<void> {
     const iconPath = this.options.iconsPath || path.join(this.options.outputPath, 'icons');
-    const svgFiles = await glob(`${iconPath}/*.svg`);
+    let svgFiles = await glob(`${iconPath}/*.svg`);
 
     if (svgFiles.length === 0) {
       this.logger.warning(`No SVG files found in ${iconPath}`);
       return;
     }
 
-    for (const file of svgFiles) {
+    const filteredSvgFiles = svgFiles.filter((file) => {
+      const fileName = file.match(/[^\\]+$/)?.[0] || '';
+      return !this.options.ignoreFiles?.includes(fileName);
+    });
+
+    for (const file of filteredSvgFiles) {
       await this.optimizeSvgFile(file);
     }
   }
@@ -91,7 +96,7 @@ export class IconOptimizer {
    * Process SVG content and optimize it
    */
   private async processSvgContent(content: string): Promise<ProcessSvgResult> {
-    const iconRegex = /<svg\s+([^>]*?id="([^"]+)"[^>]*?)>([\s\S]*?)<\/svg>/g;
+    const iconRegex = /<(svg|symbol)\s+([^>]*?id="([^"]+)"[^>]*?)>([\s\S]*?)<\/(svg|symbol)>/g;
     let match: RegExpExecArray | null;
     let totalCount = 0;
     let removedCount = 0;
@@ -100,12 +105,12 @@ export class IconOptimizer {
     const icons: string[] = [];
 
     while ((match = iconRegex.exec(content)) !== null) {
-      const [, attrs, id, paths] = match;
+      const [, tagType, attrs, id, paths] = match;
       totalCount++;
 
       if (this.usedIcons.has(id)) {
         const cleanedAttrs = svgFormatter.cleanAttributes(attrs, id);
-        icons.push(`    <svg ${cleanedAttrs}>${paths}</svg>`);
+        icons.push(`    <${tagType} ${cleanedAttrs}>${paths}</${tagType}>`);
       } else {
         removedCount++;
         this.logger.log(`Removed unused icon: ${id}`, true);
@@ -113,7 +118,6 @@ export class IconOptimizer {
     }
 
     const optimizedContent = await this.buildOptimizedContent(svgStart, icons);
-
     return { optimizedContent, removedCount, totalCount };
   }
 

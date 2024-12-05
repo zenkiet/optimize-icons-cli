@@ -11,13 +11,15 @@ export class CommandManager {
     this.program
       .option('-o, --output-path <path>', 'Output path containing the built files')
       .option('-i, --icons-path <path>', 'Path to icons directory')
+      .option('-I, --ignore-file <file...>', 'Files to ignore')
       .option('-v, --verbose', 'Show verbose output')
       .addHelpText(
         'after',
         `
 Examples:
   $ optimize-icons -o dist/browser
-  $ optimize-icons -o dist/browser -i dist/browser/icons -v`
+  $ optimize-icons -o dist/browser -i dist/browser/icons -v
+  $ optimize-icons -o dist/browser -i dist/browser/icons -I icon1.svg icon2.svg`
       );
   }
 

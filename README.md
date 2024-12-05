@@ -1,7 +1,7 @@
 # optimize-icons-cli
 
 <p align="center">
-  <img src="assets/logo.png" alt="Optimize Icons CLI" width="300" height="300"/>
+  <img src="https://raw.githubusercontent.com/zenkiet/optimize-icons-cli/refs/heads/main/assets/logo.png" alt="Optimize Icons CLI" width="300" height="300"/>
 </p>
 
 <h1 align="center">optimize-icons-cli</h1>
@@ -59,6 +59,9 @@ optimize-icons
 # Specify output path
 optimize-icons -o dist/browser
 
+# Specify icon file to ignore (comma-separated)
+optimize-icons -I file1.svg,file2.svg
+
 # Enable verbose mode
 optimize-icons -o dist/browser -v
 
@@ -78,6 +81,7 @@ The tool will prompt you for:
 
 - Output path (default: dist/browser)
 - Icons path (default: dist/browser/icons)
+- Icons to ignore (comma-separated)
 - Verbose mode (yes/no)
 
 ### Options
@@ -86,6 +90,7 @@ The tool will prompt you for:
 | --------------- | ----- | ----------------------------------------------------- |
 | `--output-path` | `-o`  | Specify the output dist directory for optimized icons |
 | `--icons-path`  | `-i`  | Specify the icons directory for optimized icons       |
+| `--ignore`      | `-I`  | Specify icons to ignore (comma-separated)              |
 | `--verbose`     | `-v`  | Enable verbose output                                 |
 | `--version`     | -     | Show version number                                   |
 | `--help`        | -     | Show help                                             |
@@ -108,6 +113,8 @@ The tool accepts the following configuration options:
 ```typescript
 interface OptimizeIconsOptions {
   outputPath: string; // Path where optimized icons will be saved
+  iconsPath: string; // Path where original icons are located
+  ignoreFiles: string[]; // List of icons to ignore
   verbose: boolean; // Enable detailed logging
 }
 ```
