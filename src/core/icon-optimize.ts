@@ -91,7 +91,7 @@ export class IconOptimizer {
    * Process SVG content and optimize it
    */
   private async processSvgContent(content: string): Promise<ProcessSvgResult> {
-    const iconRegex = /<svg\s+([^>]*?id="([^"]+)"[^>]*?)>([\s\S]*?)<\/svg>/g;
+    const iconRegex = /<(\w+)\s+([^>]*?id="([^"]+)"[^>]*?)>([\s\S]*?)<\/\1>/g;
     let match: RegExpExecArray | null;
     let totalCount = 0;
     let removedCount = 0;
