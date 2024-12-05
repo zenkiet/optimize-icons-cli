@@ -1,5 +1,5 @@
 import inquirer from 'inquirer';
-import { ICONS_DIR, OUTPUT_DIR, VERBOSE_DEFAULT } from '../constants';
+import { ICONS_DIR, IGNORE_FILE, OUTPUT_DIR, VERBOSE_DEFAULT } from '../constants';
 import IconOptimizer from '../core/icon-optimize';
 import { OptimizeIconsOptions } from '../core/types';
 import { BaseCommand } from './base-command';
@@ -34,6 +34,13 @@ export class OptimizeCommand implements BaseCommand {
         },
       },
       {
+        type: 'input',
+        name: 'ignoreFiles',
+        message: 'Enter files to ignore (comma separated):',
+        default: IGNORE_FILE.join(','),
+        filter: (input) => input.split(',').map((item: string) => item.trim()),
+      },
+      {
         type: 'confirm',
         name: 'verbose',
         message: 'Enable verbose output?',
@@ -50,6 +57,7 @@ export class OptimizeCommand implements BaseCommand {
         ? {
             outputPath: this.options.outputPath || OUTPUT_DIR,
             iconsPath: this.options.iconsPath || ICONS_DIR,
+            ignoreFiles: this.options.ignoreFiles || IGNORE_FILE,
             verbose: this.options.verbose || VERBOSE_DEFAULT,
           }
         : await this.promptUserInput();
