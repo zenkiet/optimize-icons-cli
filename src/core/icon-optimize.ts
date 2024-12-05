@@ -109,8 +109,7 @@ export class IconOptimizer {
       totalCount++;
 
       if (this.usedIcons.has(id)) {
-        const cleanedAttrs = svgFormatter.cleanAttributes(attrs, id);
-        icons.push(`    <${tagType} ${cleanedAttrs}>${paths}</${tagType}>`);
+        icons.push(`    <${tagType} ${attrs}>${paths}</${tagType}>`);
       } else {
         removedCount++;
         this.logger.log(`Removed unused icon: ${id}`, true);
