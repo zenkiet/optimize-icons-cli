@@ -29,19 +29,19 @@
   "dependencies": {
     "colorette": "^2.0.20",
     "commander": "^12.1.0",
-    "glob": "^11.0.0",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.2.0",
     "inquirer": "^12.1.0",
     "ora": "^5.4.1",
-    "prettier": "^3.3.3",
-    "yargs": "^17.7.2"
+    "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
-    "@types/glob": "^8.1.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^22.9.0",
-    "@types/yargs": "^17.0.33",
+    "gitmoji-cli": "^9.5.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "prettier-plugin-organize-imports": "^4.1.0",
