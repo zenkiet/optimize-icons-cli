@@ -2,6 +2,7 @@ import * as path from 'path';
 import { FileSystemManager } from '../utils/fileSystem';
 import { svgFormatter } from '../utils/formatter';
 import { Logger } from '../utils/logger';
+import { ui } from '../utils/ui';
 import { OptimizationStats, OptimizeIconsOptions, ProcessSvgResult } from './types';
 
 export class IconOptimizer {
@@ -71,9 +72,16 @@ export class IconOptimizer {
       return !this.options.ignoreFiles?.includes(fileName);
     });
 
-    for (const file of filteredSvgFiles) {
+    ui.startProgress(filteredSvgFiles.length);
+
+    for (let i = 0; i < filteredSvgFiles.length; i++) {
+      const file = filteredSvgFiles[i];
+      const fileName = path.basename(file);
+      ui.updateProgress(i + 1, `Processing ${fileName}`);
       await this.optimizeSvgFile(file);
     }
+
+    ui.stopProgress();
   }
 
   /**

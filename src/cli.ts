@@ -1,6 +1,7 @@
-import { red } from 'colorette';
+import chalk from 'chalk';
 import { Command } from 'commander';
 import { CommandManager } from './command/command-manager';
+import { ui } from './utils/ui';
 
 type PackageJson = Readonly<{
   version: string;
@@ -37,10 +38,11 @@ class CLI {
 
   public async run(): Promise<void> {
     try {
+      ui.showWelcome();
       await this.commandManager.executeCommand();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(red('Fatal error:'), errorMessage);
+      console.error(chalk.red('Fatal error:'), errorMessage);
       process.exit(1);
     }
   }
@@ -53,7 +55,7 @@ if (require.main === module) {
       await CLI.getInstance().run();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(red('Fatal error:'), errorMessage);
+      console.error(chalk.red('Fatal error:'), errorMessage);
       process.exit(1);
     }
   })();
