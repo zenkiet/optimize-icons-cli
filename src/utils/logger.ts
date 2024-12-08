@@ -1,59 +1,72 @@
-import { blue, bold, green, red, yellow } from 'colorette';
-import ora, { Ora } from 'ora';
-import { OptimizationStats } from '../core/types';
+import boxen from 'boxen';
+import chalk from 'chalk';
+import ora from 'ora';
+import { OptimizationStats } from '../core/types.js';
 
 export class Logger {
-  private _spinner: Ora;
+  private _spinner: ora.Ora;
 
   constructor(private verbose: boolean = false) {
-    this._spinner = ora();
+    this._spinner = ora({
+      color: 'cyan',
+    });
   }
 
   startSpinner(text: string): void {
-    this._spinner.start(blue(text));
+    this._spinner.start(chalk.blue(text));
   }
 
   stopSpinner(success: boolean, text?: string): void {
     if (success) {
-      this._spinner.succeed(green(text || 'Complete'));
+      this._spinner.succeed(chalk.green(text || 'Complete'));
     } else {
-      this._spinner.fail(red(text || 'Failed'));
+      this._spinner.fail(chalk.red(text || 'Failed'));
     }
   }
 
   log(message: string, isVerbose = false): void {
     if (!isVerbose || this.verbose) {
-      console.log(blue(message));
+      console.log(chalk.blue('→'), message);
     }
   }
 
   error(message: string, error?: Error): void {
-    console.error(message);
+    console.error(chalk.red('✖'), message);
     if (error && this.verbose) {
-      console.error(red(error.stack!));
+      console.error(chalk.red(error.stack!));
     }
   }
 
   warning(message: string): void {
-    console.warn(yellow(message));
+    console.warn(chalk.yellow('⚠'), message);
   }
 
   success(message: string): void {
-    console.log(green(message));
+    console.log(chalk.green('✔'), message);
   }
 
-  formatBytes(bytes: number): string {
+  private formatBytes(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }
 
   printSummary(stats: OptimizationStats): void {
-    console.log('\n' + bold('Optimization Summary:'));
-    console.log(blue(`Total icons processed: ${stats.totalIcons}`));
-    console.log(yellow(`Icons removed: ${stats.removedIcons}`));
-    console.log(green(`Bytes saved: ${this.formatBytes(stats.savedBytes)}`));
+    console.log(
+      boxen(
+        chalk.bold('Optimization Summary\n\n') +
+          `${chalk.blue('Total icons processed:')} ${stats.totalIcons}\n` +
+          `${chalk.yellow('Icons removed:')} ${stats.removedIcons}\n` +
+          `${chalk.green('Bytes saved:')} ${this.formatBytes(stats.savedBytes)}`,
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'green',
+        }
+      )
+    );
   }
 }

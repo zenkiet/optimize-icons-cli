@@ -1,8 +1,8 @@
-import { promises as fs } from 'fs';
-import { glob } from 'glob';
 import * as path from 'path';
+import { FileSystemManager } from '../utils/fileSystem';
 import { svgFormatter } from '../utils/formatter';
 import { Logger } from '../utils/logger';
+import { ui } from '../utils/ui';
 import { OptimizationStats, OptimizeIconsOptions, ProcessSvgResult } from './types';
 
 export class IconOptimizer {
@@ -40,10 +40,10 @@ export class IconOptimizer {
    * Find all used icons in JS and HTML files
    */
   private async findUsedIcons(): Promise<void> {
-    const files = await glob(`${this.options.outputPath}/**/*.{js,html}`);
+    const files = await FileSystemManager.findFiles(`${this.options.outputPath}/**/*.{js,html}`);
 
     for (const file of files) {
-      const content = await fs.readFile(file, 'utf8');
+      const content = await FileSystemManager.readFile(file);
       const iconMatches = content.match(/[a-zA-Z_]+:[a-zA-Z0-9_-]+/g) || [];
 
       iconMatches.forEach((match) => {
@@ -60,7 +60,7 @@ export class IconOptimizer {
    */
   private async processIconFiles(): Promise<void> {
     const iconPath = this.options.iconsPath || path.join(this.options.outputPath, 'icons');
-    let svgFiles = await glob(`${iconPath}/*.svg`);
+    let svgFiles = await FileSystemManager.findFiles(`${iconPath}/*.svg`);
 
     if (svgFiles.length === 0) {
       this.logger.warning(`No SVG files found in ${iconPath}`);
@@ -72,16 +72,23 @@ export class IconOptimizer {
       return !this.options.ignoreFiles?.includes(fileName);
     });
 
-    for (const file of filteredSvgFiles) {
+    ui.startProgress(filteredSvgFiles.length);
+
+    for (let i = 0; i < filteredSvgFiles.length; i++) {
+      const file = filteredSvgFiles[i];
+      const fileName = path.basename(file);
+      ui.updateProgress(i + 1, `Processing ${fileName}`);
       await this.optimizeSvgFile(file);
     }
+
+    ui.stopProgress();
   }
 
   /**
    * Optimize individual SVG file
    */
   private async optimizeSvgFile(filePath: string): Promise<void> {
-    const content = await fs.readFile(filePath, 'utf8');
+    const content = await FileSystemManager.readFile(filePath);
     const fileName = path.basename(filePath);
 
     this.logger.log(`\nProcessing ${fileName}...`);
@@ -89,7 +96,7 @@ export class IconOptimizer {
     const { optimizedContent, removedCount, totalCount } = await this.processSvgContent(content);
 
     this.updateStats(content.length, optimizedContent.length, totalCount, removedCount);
-    await fs.writeFile(filePath, optimizedContent);
+    await FileSystemManager.writeFile(filePath, optimizedContent);
   }
 
   /**
