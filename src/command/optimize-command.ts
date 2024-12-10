@@ -4,7 +4,7 @@ import inquirer from 'inquirer';
 import path from 'path';
 import { OUTPUT_DIR } from '../constants';
 import IconOptimizer from '../core/icon-optimize';
-import { OptimizeIconsOptions } from '../core/types';
+import { OptimizeIconsOptions, SvgFileSelection } from '../core/types';
 import { FileSystemManager } from '../utils/fileSystem';
 import { BaseCommand } from './base-command';
 
@@ -57,6 +57,7 @@ export class OptimizeCommand implements BaseCommand {
           name: file,
           value: file,
         })),
+        default: true,
         validate: (answer) => {
           if (answer.length === 0) {
             return 'You must choose at least one file';
@@ -66,7 +67,7 @@ export class OptimizeCommand implements BaseCommand {
       },
     ]);
 
-    const names: string[] = [];
+    const svgSelection: SvgFileSelection[] = [];
 
     for (const file of fileSelectionAnswer.selectedFiles) {
       const nameAnswer = await inquirer.prompt([
@@ -83,7 +84,7 @@ export class OptimizeCommand implements BaseCommand {
           },
         },
       ]);
-      names.push(nameAnswer.customName);
+      svgSelection.push({ filename: file, customName: nameAnswer.customName });
     }
 
     // Final verbose option
@@ -99,7 +100,8 @@ export class OptimizeCommand implements BaseCommand {
     return {
       outputPath: outputPathAnswer.outputPath,
       iconsPath: iconsPathAnswer.iconsPath,
-      names: names.join(','),
+      names: svgSelection.map((selection) => selection.customName).join(','),
+      ignoreFiles: svgFiles.filter((file) => !fileSelectionAnswer.selectedFiles.includes(file)),
       verbose: verboseAnswer.verbose,
     };
   }
@@ -122,7 +124,9 @@ export class OptimizeCommand implements BaseCommand {
   public displayCommand(options: OptimizeIconsOptions): void {
     const command = `optimize-icons -o ${options.outputPath} -i ${options.iconsPath} ${
       options?.names.length ? `-n "${options.names}"` : ''
-    } ${options.verbose ? '-v' : ''}`;
+    } ${
+      options.ignoreFiles?.length ? `-I "${options.ignoreFiles.join(',')}" ` : ''
+    }  ${options.verbose ? '-v' : ''}`;
 
     console.log(
       boxen(chalk.green('Suggested command:\n\n') + chalk.yellow(command), {

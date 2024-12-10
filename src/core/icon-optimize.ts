@@ -78,15 +78,15 @@ export class IconOptimizer {
       return;
     }
 
-    // const filteredSvgFiles = svgFiles.filter((file) => {
-    //   const fileName = file.match(/[^\\]+$/)?.[0] || '';
-    //   return !this.options.ignoreFiles?.includes(fileName);
-    // });
+    const filteredSvgFiles = svgFiles.filter((file) => {
+      const fileName = file.match(/[^\\]+$/)?.[0] || '';
+      return !this.options.ignoreFiles?.includes(fileName);
+    });
 
-    // ui.startProgress(filteredSvgFiles.length);
+    ui.startProgress(filteredSvgFiles.length);
 
-    for (let i = 0; i < svgFiles.length; i++) {
-      const file = svgFiles[i];
+    for (let i = 0; i < filteredSvgFiles.length; i++) {
+      const file = filteredSvgFiles[i];
       const fileName = path.basename(file);
       ui.updateProgress(i + 1, `Processing ${fileName}`);
       await this.optimizeSvgFile(file);

@@ -7,6 +7,7 @@ export interface OptimizeIconsOptions {
   outputPath: string;
   iconsPath: string;
   names: string;
+  ignoreFiles?: string[];
   verbose?: boolean;
 }
 
