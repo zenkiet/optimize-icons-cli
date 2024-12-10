@@ -1,3 +1,5 @@
+import boxen from 'boxen';
+import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { ICONS_DIR, IGNORE_FILE, OUTPUT_DIR, VERBOSE_DEFAULT } from '../constants';
 import IconOptimizer from '../core/icon-optimize';
@@ -7,7 +9,7 @@ import { BaseCommand } from './base-command';
 export class OptimizeCommand implements BaseCommand {
   constructor(private options: Partial<OptimizeIconsOptions>) {}
 
-  private async promptUserInput(): Promise<OptimizeIconsOptions> {
+  public async promptUserInput(): Promise<OptimizeIconsOptions> {
     const answers = await inquirer.prompt<OptimizeIconsOptions>([
       {
         type: 'input',
@@ -38,7 +40,11 @@ export class OptimizeCommand implements BaseCommand {
         name: 'ignoreFiles',
         message: 'Enter files to ignore (comma separated):',
         default: IGNORE_FILE.join(','),
-        filter: (input) => input.split(',').map((item: string) => item.trim()),
+        filter: (input) =>
+          input
+            .split(',')
+            .map((item: string) => item.trim())
+            .filter((item: string) => item.length > 0),
       },
       {
         type: 'confirm',
@@ -64,5 +70,22 @@ export class OptimizeCommand implements BaseCommand {
 
     const optimizer = new IconOptimizer(config);
     await optimizer.optimize();
+  }
+
+  public displayCommand(options: OptimizeIconsOptions): void {
+    const command = `optimize-icons -o ${options.outputPath} -i ${options.iconsPath} ${
+      options.ignoreFiles && options.ignoreFiles.length > 0
+        ? `-I ${options.ignoreFiles.join(' ')}`
+        : ''
+    } ${options.verbose ? '-v' : ''}`;
+
+    console.log(
+      boxen(chalk.green('Suggested command:\n\n') + chalk.yellow(command), {
+        padding: 1,
+        margin: 1,
+        borderStyle: 'round',
+        borderColor: 'green',
+      })
+    );
   }
 }

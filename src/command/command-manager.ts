@@ -25,8 +25,16 @@ Examples:
 
   public async executeCommand(): Promise<void> {
     this.program.parse();
+
     const options = this.program.opts<Partial<OptimizeIconsOptions>>();
-    const optimizeCommand = new OptimizeCommand(options);
-    await optimizeCommand.execute();
+
+    if (Object.keys(options).length === 0) {
+      const optimizeCommand = new OptimizeCommand({});
+      const answers = await optimizeCommand.promptUserInput();
+      optimizeCommand.displayCommand(answers);
+    } else {
+      const optimizeCommand = new OptimizeCommand(options);
+      await optimizeCommand.execute();
+    }
   }
 }
