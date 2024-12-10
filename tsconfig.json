@@ -2,16 +2,30 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
+    "incremental": true,
+    "tsBuildInfoFile": "./buildcache/tsbuildinfo",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "removeComments": true,
+    "preserveConstEnums": false,
+    "resolveJsonModule": true,
+    "baseUrl": "./src",
+    "paths": {
+      "*": ["*", "src/*"]
+    }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist", "tests", "**/*.spec.ts", "**/*.test.ts"]
 }
