@@ -7,6 +7,10 @@
   "bin": {
     "optimize-icons": "./bin/cli.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zenkiet/optimize-icons-cli"
+  },
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/cli.js",
