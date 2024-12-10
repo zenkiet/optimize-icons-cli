@@ -1,16 +1,18 @@
 import boxen from 'boxen';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import { ICONS_DIR, IGNORE_FILE, OUTPUT_DIR, VERBOSE_DEFAULT } from '../constants';
+import path from 'path';
+import { OUTPUT_DIR } from '../constants';
 import IconOptimizer from '../core/icon-optimize';
 import { OptimizeIconsOptions } from '../core/types';
+import { FileSystemManager } from '../utils/fileSystem';
 import { BaseCommand } from './base-command';
 
 export class OptimizeCommand implements BaseCommand {
   constructor(private options: Partial<OptimizeIconsOptions>) {}
 
   public async promptUserInput(): Promise<OptimizeIconsOptions> {
-    const answers = await inquirer.prompt<OptimizeIconsOptions>([
+    const outputPathAnswer = await inquirer.prompt([
       {
         type: 'input',
         name: 'outputPath',
@@ -23,11 +25,14 @@ export class OptimizeCommand implements BaseCommand {
           return true;
         },
       },
+    ]);
+
+    const iconsPathAnswer = await inquirer.prompt([
       {
         type: 'input',
         name: 'iconsPath',
         message: 'Enter icons directory path:',
-        default: ICONS_DIR,
+        default: `${outputPathAnswer.outputPath}/assets/icons`,
         validate: (input) => {
           if (input.trim().length === 0) {
             return 'Output path is required';
@@ -35,17 +40,54 @@ export class OptimizeCommand implements BaseCommand {
           return true;
         },
       },
+    ]);
+
+    const svgFiles = await this.findSvgFiles(iconsPathAnswer.iconsPath);
+    if (svgFiles.length === 0) {
+      throw new Error(chalk.red('No SVG files found in the specified directory.'));
+    }
+
+    // Let user select SVG files
+    const fileSelectionAnswer = await inquirer.prompt([
       {
-        type: 'input',
-        name: 'ignoreFiles',
-        message: 'Enter files to ignore (comma separated):',
-        default: IGNORE_FILE.join(','),
-        filter: (input) =>
-          input
-            .split(',')
-            .map((item: string) => item.trim())
-            .filter((item: string) => item.length > 0),
+        type: 'checkbox',
+        name: 'selectedFiles',
+        message: 'Select SVG files to optimize:',
+        choices: svgFiles.map((file) => ({
+          name: file,
+          value: file,
+        })),
+        validate: (answer) => {
+          if (answer.length === 0) {
+            return 'You must choose at least one file';
+          }
+          return true;
+        },
       },
+    ]);
+
+    const names: string[] = [];
+
+    for (const file of fileSelectionAnswer.selectedFiles) {
+      const nameAnswer = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'customName',
+          message: `Enter name for ${file}:`,
+          default: this.convertToUnderscoreName(file),
+          validate: (input) => {
+            if (input.trim().length === 0) {
+              return 'Name is required';
+            }
+            return true;
+          },
+        },
+      ]);
+      names.push(nameAnswer.customName);
+    }
+
+    // Final verbose option
+    const verboseAnswer = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'verbose',
@@ -54,7 +96,12 @@ export class OptimizeCommand implements BaseCommand {
       },
     ]);
 
-    return answers;
+    return {
+      outputPath: outputPathAnswer.outputPath,
+      iconsPath: iconsPathAnswer.iconsPath,
+      names: names.join(','),
+      verbose: verboseAnswer.verbose,
+    };
   }
 
   public async execute(): Promise<void> {
@@ -62,9 +109,9 @@ export class OptimizeCommand implements BaseCommand {
       this.options.outputPath || this.options.verbose
         ? {
             outputPath: this.options.outputPath || OUTPUT_DIR,
-            iconsPath: this.options.iconsPath || ICONS_DIR,
-            ignoreFiles: this.options.ignoreFiles || IGNORE_FILE,
-            verbose: this.options.verbose || VERBOSE_DEFAULT,
+            iconsPath: this.options.iconsPath || `${OUTPUT_DIR}/assets/icons`,
+            names: this.options.names || '',
+            verbose: this.options.verbose,
           }
         : await this.promptUserInput();
 
@@ -74,9 +121,7 @@ export class OptimizeCommand implements BaseCommand {
 
   public displayCommand(options: OptimizeIconsOptions): void {
     const command = `optimize-icons -o ${options.outputPath} -i ${options.iconsPath} ${
-      options.ignoreFiles && options.ignoreFiles.length > 0
-        ? `-I ${options.ignoreFiles.join(' ')}`
-        : ''
+      options?.names.length ? `-n "${options.names}"` : ''
     } ${options.verbose ? '-v' : ''}`;
 
     console.log(
@@ -87,5 +132,22 @@ export class OptimizeCommand implements BaseCommand {
         borderColor: 'green',
       })
     );
+  }
+
+  private async findSvgFiles(iconsPath: string): Promise<string[]> {
+    try {
+      const files = await FileSystemManager.findFiles(`${iconsPath}/*.svg`);
+      return files.map((file) => path.basename(file));
+    } catch (error) {
+      console.error(chalk.red('Error finding SVG files:'), error);
+      return [];
+    }
+  }
+
+  private convertToUnderscoreName(filename: string): string {
+    return filename
+      .toLowerCase()
+      .replace(/\.svg$/, '')
+      .replace(/[-\s]/g, '_');
   }
 }

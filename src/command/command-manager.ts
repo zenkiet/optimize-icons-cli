@@ -11,7 +11,7 @@ export class CommandManager {
     this.program
       .option('-o, --output-path <path>', 'Output path containing the built files')
       .option('-i, --icons-path <path>', 'Path to icons directory')
-      .option('-I, --ignore-file <file...>', 'Files to ignore')
+      .option('-n, --names <names>', 'Custom names for SVG files (comma-separated)')
       .option('-v, --verbose', 'Show verbose output')
       .addHelpText(
         'after',
@@ -19,7 +19,8 @@ export class CommandManager {
 Examples:
   $ optimize-icons -o dist/browser
   $ optimize-icons -o dist/browser -i dist/browser/icons -v
-  $ optimize-icons -o dist/browser -i dist/browser/icons -I icon1.svg icon2.svg`
+  $ optimize-icons -o dist/browser -i dist/browser/icons -n custom_icon1,custom_icon2
+  $ optimize-icons -o dist/browser -i dist/browser/icons -n "icon_one,icon_two" -v`
       );
   }
 
