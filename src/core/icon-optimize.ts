@@ -42,9 +42,18 @@ export class IconOptimizer {
   private async findUsedIcons(): Promise<void> {
     const files = await FileSystemManager.findFiles(`${this.options.outputPath}/**/*.{js,html}`);
 
+    const names = this.options.names.split(',').map((name) => name.trim());
+    if (names.length === 0) {
+      this.logger.error('No custom names provided');
+      return;
+    }
+
+    const namesPattern = names.map((name) => `${name}:[a-zA-Z0-9_-]+`).join('|');
+    const iconRegex = new RegExp(namesPattern, 'g');
+
     for (const file of files) {
       const content = await FileSystemManager.readFile(file);
-      const iconMatches = content.match(/[a-zA-Z_]+:[a-zA-Z0-9_-]+/g) || [];
+      const iconMatches = content.match(iconRegex) || [];
 
       iconMatches.forEach((match) => {
         const [, iconId] = match.split(':');
@@ -52,14 +61,16 @@ export class IconOptimizer {
       });
     }
 
-    this.logger.log(`Found ${this.usedIcons.size} used icons`);
+    this.logger.log(
+      `Found ${this.usedIcons.size} used icons for specified names: ${names.join(', ')}`
+    );
   }
 
   /**
    * Process all SVG icon files
    */
   private async processIconFiles(): Promise<void> {
-    const iconPath = this.options.iconsPath || path.join(this.options.outputPath, 'icons');
+    const iconPath = this.options.iconsPath;
     let svgFiles = await FileSystemManager.findFiles(`${iconPath}/*.svg`);
 
     if (svgFiles.length === 0) {
@@ -67,15 +78,15 @@ export class IconOptimizer {
       return;
     }
 
-    const filteredSvgFiles = svgFiles.filter((file) => {
-      const fileName = file.match(/[^\\]+$/)?.[0] || '';
-      return !this.options.ignoreFiles?.includes(fileName);
-    });
+    // const filteredSvgFiles = svgFiles.filter((file) => {
+    //   const fileName = file.match(/[^\\]+$/)?.[0] || '';
+    //   return !this.options.ignoreFiles?.includes(fileName);
+    // });
 
-    ui.startProgress(filteredSvgFiles.length);
+    // ui.startProgress(filteredSvgFiles.length);
 
-    for (let i = 0; i < filteredSvgFiles.length; i++) {
-      const file = filteredSvgFiles[i];
+    for (let i = 0; i < svgFiles.length; i++) {
+      const file = svgFiles[i];
       const fileName = path.basename(file);
       ui.updateProgress(i + 1, `Processing ${fileName}`);
       await this.optimizeSvgFile(file);
@@ -88,15 +99,25 @@ export class IconOptimizer {
    * Optimize individual SVG file
    */
   private async optimizeSvgFile(filePath: string): Promise<void> {
-    const content = await FileSystemManager.readFile(filePath);
     const fileName = path.basename(filePath);
 
-    this.logger.log(`\nProcessing ${fileName}...`);
+    try {
+      const content = await FileSystemManager.readFile(filePath);
+      this.logger.log(`\nProcessing ${fileName}...`);
 
-    const { optimizedContent, removedCount, totalCount } = await this.processSvgContent(content);
+      const { optimizedContent, removedCount, totalCount } = await this.processSvgContent(content);
 
-    this.updateStats(content.length, optimizedContent.length, totalCount, removedCount);
-    await FileSystemManager.writeFile(filePath, optimizedContent);
+      if (removedCount > 0) {
+        this.updateStats(content.length, optimizedContent.length, totalCount, removedCount);
+        await FileSystemManager.writeFile(filePath, optimizedContent);
+        this.logger.log(`Successfully optimized ${fileName} (removed ${removedCount} icons)`);
+      } else {
+        this.logger.log(`No changes needed for ${fileName}`);
+      }
+    } catch (error) {
+      this.logger.error(`Failed to process ${fileName}:`);
+      throw error;
+    }
   }
 
   /**

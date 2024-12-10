@@ -1,7 +1,12 @@
+export interface SvgFileSelection {
+  filename: string;
+  customName: string;
+}
+
 export interface OptimizeIconsOptions {
   outputPath: string;
-  iconsPath?: string;
-  ignoreFiles?: string[];
+  iconsPath: string;
+  names: string;
   verbose?: boolean;
 }
 
