@@ -11,8 +11,8 @@ export class CommandManager {
     this.program
       .option('-o, --output-path <path>', 'Output path containing the built files')
       .option('-i, --icons-path <path>', 'Path to icons directory')
+      .option('-I, --ignore-files <files>', 'Ignore specific SVG files (comma-separated)')
       .option('-n, --names <names>', 'Custom names for SVG files (comma-separated)')
-      .option('-I, --ignore-file <file...>', 'Files to ignore')
       .option('-v, --verbose', 'Show verbose output')
       .addHelpText(
         'after',

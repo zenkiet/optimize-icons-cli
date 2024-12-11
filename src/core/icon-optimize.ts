@@ -79,8 +79,8 @@ export class IconOptimizer {
     }
 
     const filteredSvgFiles = svgFiles.filter((file) => {
-      const fileName = file.match(/[^\\]+$/)?.[0] || '';
-      return !this.options.ignoreFiles?.includes(fileName);
+      const fileName = path.basename(file);
+      return !this.options.ignoreFiles?.split(',')?.includes(fileName);
     });
 
     ui.startProgress(filteredSvgFiles.length);

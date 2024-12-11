@@ -101,21 +101,23 @@ export class OptimizeCommand implements BaseCommand {
       outputPath: outputPathAnswer.outputPath,
       iconsPath: iconsPathAnswer.iconsPath,
       names: svgSelection.map((selection) => selection.customName).join(','),
-      ignoreFiles: svgFiles.filter((file) => !fileSelectionAnswer.selectedFiles.includes(file)),
+      ignoreFiles: svgFiles
+        .filter((file) => !fileSelectionAnswer.selectedFiles.includes(file))
+        .join(','),
       verbose: verboseAnswer.verbose,
     };
   }
 
   public async execute(): Promise<void> {
-    const config: OptimizeIconsOptions =
-      this.options.outputPath || this.options.verbose
-        ? {
-            outputPath: this.options.outputPath || OUTPUT_DIR,
-            iconsPath: this.options.iconsPath || `${OUTPUT_DIR}/assets/icons`,
-            names: this.options.names || '',
-            verbose: this.options.verbose,
-          }
-        : await this.promptUserInput();
+    const config: OptimizeIconsOptions = this.options.outputPath
+      ? {
+          outputPath: this.options.outputPath || OUTPUT_DIR,
+          iconsPath: this.options.iconsPath || `${OUTPUT_DIR}/assets/icons`,
+          names: this.options.names || '',
+          ignoreFiles: this.options.ignoreFiles,
+          verbose: this.options.verbose,
+        }
+      : await this.promptUserInput();
 
     const optimizer = new IconOptimizer(config);
     await optimizer.optimize();
@@ -123,9 +125,9 @@ export class OptimizeCommand implements BaseCommand {
 
   public displayCommand(options: OptimizeIconsOptions): void {
     const command = `optimize-icons -o ${options.outputPath} -i ${options.iconsPath} ${
-      options?.names.length ? `-n "${options.names}"` : ''
+      options?.names.length ? `-n ${options.names}` : ''
     } ${
-      options.ignoreFiles?.length ? `-I "${options.ignoreFiles.join(',')}" ` : ''
+      options.ignoreFiles?.length ? `-I ${options.ignoreFiles} ` : ''
     }  ${options.verbose ? '-v' : ''}`;
 
     console.log(
