@@ -3,7 +3,6 @@
     "target": "ES2022",
     "module": "CommonJS",
     "incremental": true,
-    "tsBuildInfoFile": "./buildcache/tsbuildinfo",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
