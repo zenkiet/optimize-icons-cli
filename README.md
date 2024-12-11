@@ -7,17 +7,20 @@
 <h1 align="center">optimize-icons-cli</h1>
 
 <p align="center">
+  <a href="https://github.com/zenkiet/optimize-icons-cli/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/zenkiet/optimize-icons-cli/main.yml" alt="GitHub Actions Build Status" />
+  </a>
   <a href="https://www.npmjs.com/package/optimize-icons-cli">
     <img src="https://img.shields.io/npm/v/optimize-icons-cli.svg" alt="npm version" />
   </a>
   <a href="https://www.npmjs.com/package/optimize-icons-cli">
     <img src="https://img.shields.io/npm/dm/optimize-icons-cli.svg" alt="npm downloads" />
   </a>
-  <a href="https://github.com/yourusername/optimize-icons-cli/blob/main/LICENSE">
+  <a href="https://github.com/zenkiet/optimize-icons-cli/blob/main/LICENSE">
     <img src="https://img.shields.io/npm/l/optimize-icons-cli.svg" alt="license" />
   </a>
-  <a href="https://github.com/yourusername/optimize-icons-cli/stargazers">
-    <img src="https://img.shields.io/github/stars/yourusername/optimize-icons-cli" alt="stars" />
+  <a href="https://github.com/zenkiet/optimize-icons-cli/stargazers">
+    <img src="https://img.shields.io/github/stars/zenkiet/optimize-icons-cli" alt="stars" />
   </a>
 </p>
 
@@ -53,17 +56,8 @@ pnpm add -g optimize-icons-cli
 ### Command Line
 
 ```bash
-# Basic usage
-optimize-icons
-
-# Specify output path
-optimize-icons -o dist/browser
-
-# Specify icon file to ignore (comma-separated)
-optimize-icons -I file1.svg,file2.svg
-
-# Enable verbose mode
-optimize-icons -o dist/browser -v
+# Show version
+optimize-icons --version
 
 # Show help
 optimize-icons --help
@@ -81,19 +75,21 @@ The tool will prompt you for:
 
 - Output path (default: dist/browser)
 - Icons path (default: dist/browser/icons)
+- Custom name of icons svg file (example: material_outline, material_solid...)
 - Icons to ignore (comma-separated)
 - Verbose mode (yes/no)
 
 ### Options
 
-| Option          | Alias | Description                                           |
-| --------------- | ----- | ----------------------------------------------------- |
-| `--output-path` | `-o`  | Specify the output dist directory for optimized icons |
-| `--icons-path`  | `-i`  | Specify the icons directory for optimized icons       |
-| `--ignore`      | `-I`  | Specify icons to ignore (comma-separated)              |
-| `--verbose`     | `-v`  | Enable verbose output                                 |
-| `--version`     | -     | Show version number                                   |
-| `--help`        | -     | Show help                                             |
+| Option           | Alias | Description                                           |
+| ---------------- | ----- | ----------------------------------------------------- |
+| `--output-path`  | `-o`  | Specify the output dist directory for optimized icons |
+| `--icons-path`   | `-i`  | Specify the icons directory for optimized icons       |
+| `--ignore-files` | `-I`  | Specify icons to ignore (comma-separated)             |
+| `--names`        | `-n`  | Specify the custom name of icons svg file             |
+| `--verbose`      | `-v`  | Enable verbose output                                 |
+| `--version`      | -     | Show version number                                   |
+| `--help`         | -     | Show help                                             |
 
 ## Programmatic Usage
 
@@ -114,7 +110,8 @@ The tool accepts the following configuration options:
 interface OptimizeIconsOptions {
   outputPath: string; // Path where optimized icons will be saved
   iconsPath: string; // Path where original icons are located
-  ignoreFiles: string[]; // List of icons to ignore
+  names: string; //  Custom name of icons svg file (comma-separated)
+  ignoreFiles: string; // Icons path to ignore (comma-separated)
   verbose: boolean; // Enable detailed logging
 }
 ```
